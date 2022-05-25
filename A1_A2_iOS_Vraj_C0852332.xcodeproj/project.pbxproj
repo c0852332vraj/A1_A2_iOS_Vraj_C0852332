@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ACD17106283E54CF00ED8B87 /* searchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD17105283E54CF00ED8B87 /* searchViewController.swift */; };
+		ACD17108283E590200ED8B87 /* searchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD17107283E590200ED8B87 /* searchTableViewCell.swift */; };
 		ACDFC69C283D8D66009BD32D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDFC69B283D8D66009BD32D /* AppDelegate.swift */; };
 		ACDFC69E283D8D66009BD32D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDFC69D283D8D66009BD32D /* SceneDelegate.swift */; };
 		ACDFC6A0283D8D66009BD32D /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACDFC69F283D8D66009BD32D /* ViewController.swift */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		ACD17105283E54CF00ED8B87 /* searchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchViewController.swift; sourceTree = "<group>"; };
+		ACD17107283E590200ED8B87 /* searchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = searchTableViewCell.swift; sourceTree = "<group>"; };
 		ACDFC698283D8D66009BD32D /* A1_A2_iOS_Vraj_C0852332.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = A1_A2_iOS_Vraj_C0852332.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ACDFC69B283D8D66009BD32D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ACDFC69D283D8D66009BD32D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -63,6 +67,8 @@
 				ACDFC6A4283D8D69009BD32D /* Assets.xcassets */,
 				ACDFC6A6283D8D69009BD32D /* LaunchScreen.storyboard */,
 				ACDFC6A9283D8D69009BD32D /* Info.plist */,
+				ACD17105283E54CF00ED8B87 /* searchViewController.swift */,
+				ACD17107283E590200ED8B87 /* searchTableViewCell.swift */,
 			);
 			path = A1_A2_iOS_Vraj_C0852332;
 			sourceTree = "<group>";
@@ -138,8 +144,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACD17108283E590200ED8B87 /* searchTableViewCell.swift in Sources */,
 				ACDFC6A0283D8D66009BD32D /* ViewController.swift in Sources */,
 				ACDFC69C283D8D66009BD32D /* AppDelegate.swift in Sources */,
+				ACD17106283E54CF00ED8B87 /* searchViewController.swift in Sources */,
 				ACDFC69E283D8D66009BD32D /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
