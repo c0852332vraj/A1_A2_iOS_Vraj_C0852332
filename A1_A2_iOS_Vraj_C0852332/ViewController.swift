@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var navigationBar: UINavigationBar!
     @IBOutlet var mapView: MKMapView!
     
+    @IBOutlet weak var distLabel: UILabel!
     var locManage: CLLocationManager!
     var cityArray : [MKMapItem] = []
     var polygon: MKPolygon? = nil
@@ -72,7 +73,7 @@ class ViewController: UIViewController {
     func checkPoint(location : CLLocationCoordinate2D) {
           var arrDistance : [Double] = []
           for i in 0..<cityArray.count {
-              let dist = getDistance(source: location, destination: cityArray[i].placemark.coordinate)
+              let dist = getDist(source: location, destination: cityArray[i].placemark.coordinate)
               arrDistance.append(dist)
           }
           let ss = arrDistance.max { a, b in
@@ -94,7 +95,7 @@ class ViewController: UIViewController {
               self.addAnnotations()
           }
         
-        func getDistance(source : CLLocationCoordinate2D, destination : CLLocationCoordinate2D) ->  Double {
+        func getDist(source : CLLocationCoordinate2D, destination : CLLocationCoordinate2D) ->  Double {
              let coordinate₀ = CLLocation(latitude: source.latitude, longitude: source.longitude)
              let coordinate₁ = CLLocation(latitude: destination.latitude, longitude: destination.longitude)
 
@@ -102,6 +103,50 @@ class ViewController: UIViewController {
              return Double(distanceInMeters)
          }
     
+        func viewDistance() {
+               distLabel.text = ""
+               var currentLat = locManage.location?.coordinate.latitude
+               var currentLong = locManage.location?.coordinate.longitude
+
+               var str = ""
+               for i in 0..<cityArray.count {
+                   let dist = getDist(source: locManage.location!.coordinate, destination: cityArray[i].placemark.coordinate) / 1000.0
+                   var strAn = ""
+                   if i == 0 {
+                       strAn = "A"
+                   } else if i == 1 {
+                       strAn = "B"
+                   } else if i == 2 {
+                       strAn = "C"
+                   }
+                   str += "Current location to \(strAn) : \(toFormatDist(value: dist)) \n "
+               }
+               str += " \n "
+               for i in 0..<cityArray.count {
+    
+                       var strAn = ""
+                       if i == 1 {
+                           strAn = "A to B"
+                           let dist = getDist(source: cityArray[i].placemark.coordinate, destination: cityArray[i-1].placemark.coordinate) / 1000.0
+                           str += "\(strAn) : \(toFormatDist(value: dist)) \n "
+                       } else if i == 2 {
+                           strAn = "B to C"
+                           let dist = getDist(source: cityArray[i].placemark.coordinate, destination: cityArray[i-1].placemark.coordinate) / 1000.0
+                           str += "\(strAn) : \(toFormatDist(value: dist)) \n "
+
+                           strAn = "C to A"
+                           let dist1 = getDist(source: cityArray[i].placemark.coordinate, destination: cityArray[0].placemark.coordinate) / 1000.0
+                           str += "\(strAn) : \(toFormatDist(value: dist1))"
+                       }
+                   }
+               
+               distLabel.text = str
+           }
+
+           func toFormatDist(value : Double) -> String {
+               return String(format: "%.2f km", value)
+           }
+        
      @objc func tabbedLong(sender: UILongPressGestureRecognizer) {
            print("tabbedLong")
            let alert = UIAlertController(title: "Test", message: "Add the city?", preferredStyle: .alert)
@@ -149,6 +194,8 @@ class ViewController: UIViewController {
                 annotation.coordinate = CLLocationCoordinate2D(latitude: cityArray[i].placemark.coordinate.latitude, longitude: cityArray[i].placemark.coordinate.longitude)
                 annotations.append(annotation)
             }
+            
+            viewDistance()
             mapView.addAnnotations(annotations)
             mapView.fitWhole(in: annotations, andShow: true)
         }
@@ -186,13 +233,13 @@ class ViewController: UIViewController {
     }
 extension MKPolygon {
     func contain(coor: CLLocationCoordinate2D) -> Bool {
-        let polygonRenderer = MKPolygonRenderer(polygon: self)
+        let polyRenderer = MKPolygonRenderer(polygon: self)
         let currentMapPoint: MKMapPoint = MKMapPoint(coor)
-        let polygonViewPoint: CGPoint = polygonRenderer.point(for: currentMapPoint)
-        if polygonRenderer.path == nil {
+        let polyViewPoint: CGPoint = polyRenderer.point(for: currentMapPoint)
+        if polyRenderer.path == nil {
           return false
         }else{
-          return polygonRenderer.path.contains(polygonViewPoint)
+          return polyRenderer.path.contains(polyViewPoint)
         }
     }
 }
