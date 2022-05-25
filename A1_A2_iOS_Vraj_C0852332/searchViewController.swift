@@ -50,7 +50,7 @@ extension searchViewController : UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "searchTableCell") as!
+        let cell = tableView.dequeueReusableCell(withIdentifier: "searchTableViewCell") as!
         searchTableViewCell
         cell.label.text = matchingItems[indexPath.row].placemark.title ?? ""
         return cell
