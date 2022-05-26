@@ -34,12 +34,60 @@ class ViewController: UIViewController {
             locManage.startUpdatingLocation()
         }
         
-        let tabbedLongRegonize = UILongPressGestureRecognizer(target: self, action: #selector(longPressed))
+        let tabbedLongRegonize = UILongPressGestureRecognizer(target: self, action: #selector(tabbedLong))
         self.mapView.addGestureRecognizer(tabbedLongRegonize)
         
-        item.rightBarButtonItem = UIBarButtonItem(title: "Route", style: .plain, target: self, action: #selector(addPhotosTapped))
+        item.rightBarButtonItem = UIBarButtonItem(title: "Route", style: .plain, target: self, action: #selector(clickOnMap))
         self.navigationBar.items = [item]
         
+    }
+    
+    @objc func tabbedLong(sender: UILongPressGestureRecognizer) {
+        print("tabbedLong")
+        let alert = UIAlertController(title: "Test", message: "Add the city?", preferredStyle: .alert)
+        
+        alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action: UIAlertAction!) in
+            let searchcity = self.storyboard?.instantiateViewController(withIdentifier: "searchViewController") as! searchViewController
+            searchcity.mapView = self.mapView
+            searchcity.delegate = self
+            self.navigationController?.pushViewController(searchcity, animated: true)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action: UIAlertAction!) in
+            
+        }))
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    func viewPath(source : CLLocationCoordinate2D, destination : CLLocationCoordinate2D, title : String) {
+        
+        let sourceLoc = source
+        let destinationLoc = destination
+        
+        let sourceMark = MKPlacemark(coordinate: sourceLoc)
+        let destinationMark = MKPlacemark(coordinate: destinationLoc)
+        
+        let directionReq = MKDirections.Request()
+        directionReq.source = MKMapItem(placemark: sourceMark)
+        directionReq.destination = MKMapItem(placemark: destinationMark)
+        directionReq.transportType = .automobile
+        
+        let directions = MKDirections(request: directionReq)
+        directions.calculate { (response, error) in
+            guard let directionRes = response else {
+                if let error = error {
+                    print("Got an error to get directions:\(error.localizedDescription)")
+                }
+                return
+            }
+            let path = directionRes.routes[0]
+            path.polyline.title = title
+            
+            self.mapView.addOverlay(path.polyline, level: .aboveRoads)
+            let rect = path.polyline.boundingMapRect
+            self.mapView.setRegion(MKCoordinateRegion(rect), animated: true)
+        }
     }
     
     func addPolygon() {
@@ -85,7 +133,7 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func addPhotosTapped() {
+    @objc func clickOnMap() {
         if mapView.overlays.last != nil {
             self.mapView.removeOverlay(mapView.overlays.last!)
             polygon = nil
@@ -130,7 +178,7 @@ class ViewController: UIViewController {
             self.addAnnotations()
             self.checkRouteOption()
         }
-        
+    }
         func getDist(source : CLLocationCoordinate2D, destination : CLLocationCoordinate2D) ->  Double {
             let coordinate₀ = CLLocation(latitude: source.latitude, longitude: source.longitude)
             let coordinate₁ = CLLocation(latitude: destination.latitude, longitude: destination.longitude)
@@ -140,37 +188,7 @@ class ViewController: UIViewController {
         }
         
         
-        
-        func viewPath(source : CLLocationCoordinate2D, destination : CLLocationCoordinate2D, title : String) {
-            
-            let sourceLoc = source
-            let destinationLoc = destination
-            
-            let sourceMark = MKPlacemark(coordinate: sourceLoc)
-            let destinationMark = MKPlacemark(coordinate: destinationLoc)
-            
-            let directionReq = MKDirections.Request()
-            directionReq.source = MKMapItem(placemark: sourceMark)
-            directionReq.destination = MKMapItem(placemark: destinationMark)
-            directionReq.transportType = .automobile
-            
-            let directions = MKDirections(request: directionReq)
-            directions.calculate { (response, error) in
-                guard let directionRes = response else {
-                    if let error = error {
-                        print("Got an error to get directions:\(error.localizedDescription)")
-                    }
-                    return
-                }
-                let path = directionRes.routes[0]
-                path.polyline.title = title
-                
-                self.mapView.addOverlay(path.polyline, level: .aboveRoads)
-                let rect = path.polyline.boundingMapRect
-                self.mapView.setRegion(MKCoordinateRegion(rect), animated: true)
-            }
-        }
-        
+
         func viewDistance() {
             distLabel.text = ""
             var currentLat = locManage.location?.coordinate.latitude
@@ -215,27 +233,13 @@ class ViewController: UIViewController {
             return String(format: "%.2f km", value)
         }
         
-        @objc func longPressed(sender: UILongPressGestureRecognizer) {
-            print("tabbedLong")
-            let alert = UIAlertController(title: "Test", message: "Add the city?", preferredStyle: .alert)
-            
-            alert.addAction(UIAlertAction(title: "Yes", style: .default, handler: { (action: UIAlertAction!) in
-                let searchVC = self.storyboard?.instantiateViewController(withIdentifier: "searchViewController") as! searchViewController
-                searchVC.mapView = self.mapView
-                searchVC.delegate = self
-                self.navigationController?.pushViewController(searchVC, animated: true)
-            }))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action: UIAlertAction!) in
-                
-            }))
-            
-            present(alert, animated: true, completion: nil)
-        }
+    
     }
-}
+
+
 extension ViewController : CLLocationManagerDelegate {
-    func locManage(_ manager: CLLocationManager, toUpadateLocs locations: [CLLocation]) {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last{
             let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0))
@@ -278,27 +282,6 @@ extension ViewController : citySearchOutcome {
     
 }
 
-extension ViewController : MKMapViewDelegate {
-    
-    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-        if polygon == nil {
-            let renderer = MKPolylineRenderer(overlay: overlay)
-            if overlay.title == "A" {
-                renderer.strokeColor = UIColor.blue
-            } else if overlay.title == "B" {
-                renderer.strokeColor = UIColor.red
-            } else if overlay.title == "C" {
-                renderer.strokeColor = UIColor.yellow
-            }
-            renderer.lineWidth = 4.0
-            return renderer
-        } else {
-            let renderer = MKPolygonRenderer(polygon: polygon!)
-            renderer.fillColor = UIColor.red.withAlphaComponent(0.50)
-            return renderer
-        }
-    }
-}
 
 extension MKPolygon {
     func contain(coor: CLLocationCoordinate2D) -> Bool {
@@ -343,7 +326,29 @@ extension MKMapView {
         }
         setVisibleMapRect(zoomRect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
     }
+}
+
+extension ViewController : MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if polygon == nil {
+            let renderer = MKPolylineRenderer(overlay: overlay)
+            if overlay.title == "A" {
+                renderer.strokeColor = UIColor.blue
+            } else if overlay.title == "B" {
+                renderer.strokeColor = UIColor.red
+            } else if overlay.title == "C" {
+                renderer.strokeColor = UIColor.yellow
+            }
+            renderer.lineWidth = 4.0
+            return renderer
+        } else {
+            let renderer = MKPolygonRenderer(polygon: polygon!)
+            renderer.fillColor = UIColor.red.withAlphaComponent(0.50)
+            return renderer
+        }
     }
+}
 
 
 
